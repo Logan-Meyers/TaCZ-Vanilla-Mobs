@@ -19,6 +19,8 @@ public class TaCZVanillaMobs implements ModInitializer {
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
 
-		LOGGER.info("Hello Fabric world!");
+		LOGGER.info("Modifying Vanilla Mobs to spawn with various TaCZ weapons!");
+
+        ZombieEquipRegistrar.register();
 	}
 }
