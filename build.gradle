@@ -16,6 +16,27 @@ repositories {
 	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
 	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 	// for more information about repositories.
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
+
+    maven {// Forge Config API Port
+        name = "Fuzs Mod Resources"
+        url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/"
+    }
+
+    maven {// CCA
+        name = "Ladysnake Mods"
+        url = 'https://maven.ladysnake.org/releases'
+    }
 }
 
 fabricApi {
@@ -32,7 +53,22 @@ dependencies {
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-	
+
+    // apis and stuff requires by tacz
+    implementation(include('com.github.FiguraMC.luaj:luaj-core:3.0.8-figura')) {
+        exclude group: 'org.apache.commons', module: 'commons-lang3'
+    }
+    implementation(include('com.github.FiguraMC.luaj:luaj-jse:3.0.8-figura')) {
+        exclude group: 'org.apache.commons', module: 'commons-lang3'
+    }
+    modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.2.3"))  // cca
+    modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.2.3"))  // cca
+    modApi "fuzs.forgeconfigapiport:forgeconfigapiport-fabric:8.0.2"  // forge api -> fabric
+    modImplementation(include("maven.modrinth:modernkeybinding:1.20.X-1.2.0"))  // mkb
+    implementation(include('org.apache.commons:commons-math3:3.6.1'))  // apache math3 stuff
+
+    // tacz refabricated itself
+    modImplementation "maven.modrinth:tacz-refabricated:1.20.1-0.3.0-forge1.1.7"
 }
 
 processResources {
