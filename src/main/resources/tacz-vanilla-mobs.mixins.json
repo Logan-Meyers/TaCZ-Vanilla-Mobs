@@ -1,0 +1,14 @@
+{
+	"required": true,
+	"package": "net.spud03.tacz_vanilla_mobs.mixin",
+	"compatibilityLevel": "JAVA_17",
+	"mixins": [
+		"ExampleMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"overwrites": {
+		"requireAnnotations": true
+	}
+}
