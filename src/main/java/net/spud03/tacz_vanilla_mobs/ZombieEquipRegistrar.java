@@ -5,6 +5,7 @@ import com.tacz.guns.api.entity.IGunOperator;
 import com.tacz.guns.api.item.gun.FireMode;
 import com.tacz.guns.item.ModernKineticGunItem;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.ZombieEntity;
@@ -26,13 +27,19 @@ public class ZombieEquipRegistrar {
     private static final List<ItemStack> TEMPLATES = new ArrayList<>();
 
     public static void register() {
-        buildTemplates();  // commenting this fixes null
+        // once server starts, build templates
+        ServerLifecycleEvents.SERVER_STARTED.register(server -> {
+            buildTemplates();
+            TaCZVanillaMobs.LOGGER.info("Built templates after server started");
+        });
 
         ServerEntityEvents.ENTITY_LOAD.register((entity, world) -> {
             if (!(world instanceof ServerWorld)) return;
             if (!(entity instanceof ZombieEntity zombie)) return;
 //            if (RNG.nextDouble() > CHANCE) return;
-            if (TEMPLATES.isEmpty()) return;
+            if (TEMPLATES.isEmpty()) {
+                TaCZVanillaMobs.LOGGER.warn("Templates are empty!");
+            }
 
             ItemStack template = TEMPLATES.get(RNG.nextInt(TEMPLATES.size()));
             ItemStack give = template.copy();
@@ -41,8 +48,7 @@ public class ZombieEquipRegistrar {
             zombie.setCanPickUpLoot(true);
             zombie.setEquipmentDropChance(EquipmentSlot.MAINHAND, 2.0f);  // should be pretty rare
 
-            // add shooting
-
+            // add shooting goals and AI
         });
     }
 
@@ -56,24 +62,30 @@ public class ZombieEquipRegistrar {
                                           FireMode fireMode,
                                           Identifier gunId,
                                           int ammoCount) {
-        Item item = Registries.ITEM.get(GUN_ITEM_ID);
+        // try to get item for modern_kinetic_gun
+        Item item = Registries.ITEM.getOrEmpty(GUN_ITEM_ID).orElse(Items.AIR);
+
+        // make sure item exists
         if (item == Items.AIR) {
             TaCZVanillaMobs.LOGGER.warn("modern_kinetic_gun not present");
             return ItemStack.EMPTY;  // item not present, so return empty list
         }
+
+        // return if for some reason the item is not actually an instance of the class we want
         if (!(item instanceof ModernKineticGunItem gun)) {
             TaCZVanillaMobs.LOGGER.warn("Registered item is not ModernKineticGunItem: " +
                     item.getClass().getName());
-//            return new ItemStack(item); // fallback, but won't have setters
             return ItemStack.EMPTY;  // invalid item for gun, so return empty list
         }
 
+        // create the stack for the given gun
         ItemStack stack = new ItemStack(gun);
         gun.setBulletInBarrel(stack, hasBullet);
         gun.setCurrentAmmoCount(stack, ammoCount);
         gun.setFireMode(stack, fireMode);
         gun.setGunId(stack, gunId);
 
+        // success!
         TaCZVanillaMobs.LOGGER.info("Created template for " + gunId);
         return stack;
     }
