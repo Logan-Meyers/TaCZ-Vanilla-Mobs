@@ -1,13 +1,20 @@
 package net.spud03.tacz_vanilla_mobs;
 
+import cn.sh1rocu.tacz.api.event.EntityJoinLevelEvent;
+import com.google.common.eventbus.Subscribe;
 import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.entity.IGunOperator;
 import com.tacz.guns.api.item.gun.FireMode;
 import com.tacz.guns.item.ModernKineticGunItem;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.control.MoveControl;
+import net.minecraft.entity.ai.goal.GoalSelector;
+import net.minecraft.entity.mob.HostileEntity;
+import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -15,6 +22,8 @@ import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Shadow;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,6 +61,19 @@ public class ZombieEquipRegistrar {
         });
     }
 
+//    @Shadow @Final
+//    protected GoalSelector goalSelector;
+//
+//    @Subscribe
+//    public static void EntityJoined(EntityJoinLevelEvent event) {
+//        TaCZVanillaMobs.LOGGER.info("Entity joined world!");
+//        Entity entity = event.getEntity();
+//        if (entity instanceof ZombieEntity) {
+//            ZombieEntity zombie = (ZombieEntity) entity;
+//
+//        }
+//    }
+
     private static void buildTemplates() {
         TEMPLATES.clear();
         TEMPLATES.add(makeGunStack(true, FireMode.AUTO, new Identifier("tacz", "cz75"), 16));
@@ -62,6 +84,7 @@ public class ZombieEquipRegistrar {
                                           FireMode fireMode,
                                           Identifier gunId,
                                           int ammoCount) {
+
         // try to get item for modern_kinetic_gun
         Item item = Registries.ITEM.getOrEmpty(GUN_ITEM_ID).orElse(Items.AIR);
 
