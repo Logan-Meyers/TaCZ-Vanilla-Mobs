@@ -1,9 +1,12 @@
 package net.spud03.tacz_vanilla_mobs;
 
+import com.tacz.guns.api.TimelessAPI;
+import com.tacz.guns.api.entity.IGunOperator;
 import com.tacz.guns.api.item.gun.FireMode;
 import com.tacz.guns.item.ModernKineticGunItem;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -39,6 +42,7 @@ public class ZombieEquipRegistrar {
             zombie.setEquipmentDropChance(EquipmentSlot.MAINHAND, 2.0f);  // should be pretty rare
 
             // add shooting
+
         });
     }
 
@@ -55,12 +59,13 @@ public class ZombieEquipRegistrar {
         Item item = Registries.ITEM.get(GUN_ITEM_ID);
         if (item == Items.AIR) {
             TaCZVanillaMobs.LOGGER.warn("modern_kinetic_gun not present");
-            return ItemStack.EMPTY;
+            return ItemStack.EMPTY;  // item not present, so return empty list
         }
         if (!(item instanceof ModernKineticGunItem gun)) {
             TaCZVanillaMobs.LOGGER.warn("Registered item is not ModernKineticGunItem: " +
                     item.getClass().getName());
-            return new ItemStack(item); // fallback, but won't have setters
+//            return new ItemStack(item); // fallback, but won't have setters
+            return ItemStack.EMPTY;  // invalid item for gun, so return empty list
         }
 
         ItemStack stack = new ItemStack(gun);
